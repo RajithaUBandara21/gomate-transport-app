@@ -26,7 +26,8 @@ export const { loginSuccess, logout } = authSlice.actions;
 
 export const loginUser = (credentials) => async (dispatch) => {
   try {
-    await AsyncStorage.setItem('user', JSON.stringify(credentials));
+    const userString = JSON.stringify(credentials);
+    await AsyncStorage.setItem('user', userString);
     dispatch(loginSuccess(credentials));
     return { success: true };
   } catch (error) {
@@ -46,8 +47,9 @@ export const logoutUser = () => async (dispatch) => {
 export const checkAuth = () => async (dispatch) => {
   try {
     const userData = await AsyncStorage.getItem('user');
-    if (userData) {
-      dispatch(loginSuccess(JSON.parse(userData)));
+    if (userData !== null) {
+      const parsedData = JSON.parse(userData);
+      dispatch(loginSuccess(parsedData));
     }
   } catch (error) {
     console.error('Check auth error:', error);

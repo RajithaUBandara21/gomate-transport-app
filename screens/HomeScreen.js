@@ -28,7 +28,7 @@ const HomeScreen = ({ navigation }) => {
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    navigation.replace('Login');
+    // navigation.replace('Login'); <--- REMOVED to prevent errors
   };
 
   const isFavorite = (routeId) => {

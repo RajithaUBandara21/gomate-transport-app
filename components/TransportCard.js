@@ -17,14 +17,13 @@ const TransportCard = ({ route, onPress, isFavorite, onToggleFavorite }) => {
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={[styles.route, { color: colors.text }]}>{route.route}</Text>
-          <TouchableOpacity onPress={onToggleFavorite}>
-            <Feather
-              name={isFavorite ? 'heart' : 'heart'}
-              size={22}
-              color={isFavorite ? '#E74C3C' : colors.subtext}
-              style={{ fontWeight: isFavorite ? 'bold' : 'normal' }}
-            />
-          </TouchableOpacity>
+         <TouchableOpacity onPress={onToggleFavorite}>
+  {isFavorite ? (
+    <Feather name="heart" size={22} color="#E74C3C" />
+  ) : (
+    <Feather name="heart" size={22} color={colors.subtext} />
+  )}
+</TouchableOpacity>
         </View>
         <View style={styles.typeContainer}>
           <Feather name="navigation" size={14} color={colors.primary} />

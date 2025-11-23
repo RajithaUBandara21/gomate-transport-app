@@ -59,9 +59,10 @@ export const fetchRoutes = () => async (dispatch) => {
 
 export const loadFavorites = () => async (dispatch) => {
   try {
-    const favorites = await AsyncStorage.getItem('favorites');
-    if (favorites) {
-      dispatch(setFavorites(JSON.parse(favorites)));
+    const favoritesString = await AsyncStorage.getItem('favorites');
+    if (favoritesString !== null) {
+      const parsedFavorites = JSON.parse(favoritesString);
+      dispatch(setFavorites(parsedFavorites));
     }
   } catch (error) {
     console.error('Load favorites error:', error);
@@ -76,11 +77,13 @@ export const toggleFavorite = (route) => async (dispatch, getState) => {
     if (isFavorite) {
       dispatch(removeFavorite(route.id));
       const updatedFavorites = favorites.filter((fav) => fav.id !== route.id);
-      await AsyncStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+      const favoritesString = JSON.stringify(updatedFavorites);
+      await AsyncStorage.setItem('favorites', favoritesString);
     } else {
       dispatch(addFavorite(route));
       const updatedFavorites = [...favorites, route];
-      await AsyncStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+      const favoritesString = JSON.stringify(updatedFavorites);
+      await AsyncStorage.setItem('favorites', favoritesString);
     }
   } catch (error) {
     console.error('Toggle favorite error:', error);

@@ -34,7 +34,7 @@ const LoginScreen = ({ navigation }) => {
       );
 
       if (result.success) {
-        navigation.replace('MainTabs');
+        // navigation.replace('MainTabs'); <--- REMOVED to prevent errors
       } else {
         Alert.alert('Error', 'Login failed. Please try again.');
       }
