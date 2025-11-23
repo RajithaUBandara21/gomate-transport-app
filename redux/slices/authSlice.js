@@ -34,7 +34,17 @@ export const loginUser = (credentials) => async (dispatch) => {
     return { success: false, error: error.message };
   }
 };
-
+export const registerUser = (userData) => async (dispatch) => {
+  try {
+    // In a real app, you would send data to an API endpoint
+    const userString = JSON.stringify(userData);
+    await AsyncStorage.setItem('user', userString);
+    dispatch(loginSuccess(userData)); // Automatically log in after registration
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
 export const logoutUser = () => async (dispatch) => {
   try {
     await AsyncStorage.removeItem('user');

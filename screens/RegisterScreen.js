@@ -1,4 +1,4 @@
-// screens/LoginScreen.js
+// screens/RegisterScreen.js
 import React, { useState } from 'react';
 import {
   View,
@@ -13,30 +13,31 @@ import {
 import { useDispatch } from 'react-redux';
 import { Feather } from '@expo/vector-icons';
 import CustomInput from '../components/CustomInput';
-import { loginSchema } from '../utils/validation';
-import { loginUser } from '../redux/slices/authSlice';
+import { registerSchema } from '../utils/validation';
+import { registerUser } from '../redux/slices/authSlice';
 import { useTheme } from '../utils/ThemeContext';
 
-const LoginScreen = ({ navigation }) => {
+const RegisterScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const { colors } = useTheme();
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     try {
-      await loginSchema.validate({ email, password }, { abortEarly: false });
+      await registerSchema.validate({ username, email, password }, { abortEarly: false });
       setErrors({});
 
       const result = await dispatch(
-        loginUser({ email, username: email.split('@')[0] })
+        registerUser({ username, email, password })
       );
 
       if (result.success) {
-        // Navigation handled by auth state change in StackNavigator
+        // Authentication state change will automatically trigger navigation via StackNavigator
       } else {
-        Alert.alert('Error', 'Login failed. Please try again.');
+        Alert.alert('Error', 'Registration failed. Please try again.');
       }
     } catch (err) {
       const validationErrors = {};
@@ -59,16 +60,32 @@ const LoginScreen = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={() => navigation.goBack()}
+          >
+            <Feather name="arrow-left" size={24} color={colors.text} />
+          </TouchableOpacity>
+          
           <View style={[styles.iconContainer, { backgroundColor: colors.primary }]}>
-            <Feather name="map" size={48} color="#FFF" />
+            <Feather name="user-plus" size={40} color="#FFF" />
           </View>
-          <Text style={[styles.title, { color: colors.text }]}>GoMate</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Create Account</Text>
           <Text style={[styles.subtitle, { color: colors.subtext }]}>
-            Your Travel Companion
+            Join GoMate today
           </Text>
         </View>
 
         <View style={styles.form}>
+          <CustomInput
+            icon="user"
+            placeholder="Username"
+            value={username}
+            onChangeText={setUsername}
+            error={errors.username}
+            autoCapitalize="none"
+          />
+
           <CustomInput
             icon="mail"
             placeholder="Email"
@@ -89,24 +106,17 @@ const LoginScreen = ({ navigation }) => {
           />
 
           <TouchableOpacity
-            style={[styles.loginButton, { backgroundColor: colors.primary }]}
-            onPress={handleLogin}
+            style={[styles.registerButton, { backgroundColor: colors.primary }]}
+            onPress={handleRegister}
           >
-            <Text style={styles.loginButtonText}>Login</Text>
+            <Text style={styles.registerButtonText}>Sign Up</Text>
           </TouchableOpacity>
 
           <View style={styles.footer}>
-            <Text style={{ color: colors.subtext }}>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-              <Text style={{ color: colors.primary, fontWeight: 'bold' }}>Sign Up</Text>
+            <Text style={{ color: colors.subtext }}>Already have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <Text style={{ color: colors.primary, fontWeight: 'bold' }}>Login</Text>
             </TouchableOpacity>
-          </View>
-
-          <View style={styles.hintContainer}>
-            <Feather name="info" size={16} color={colors.subtext} />
-            <Text style={[styles.hintText, { color: colors.subtext }]}>
-              Use any email and password (min 6 chars)
-            </Text>
           </View>
         </View>
       </ScrollView>
@@ -125,18 +135,26 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 48,
+    marginBottom: 32,
+    position: 'relative',
+  },
+  backButton: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    zIndex: 1,
   },
   iconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
+    marginTop: 10,
   },
   title: {
-    fontSize: 36,
+    fontSize: 32,
     fontWeight: 'bold',
     marginBottom: 8,
   },
@@ -146,14 +164,14 @@ const styles = StyleSheet.create({
   form: {
     width: '100%',
   },
-  loginButton: {
+  registerButton: {
     height: 56,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 16,
   },
-  loginButtonText: {
+  registerButtonText: {
     color: '#FFF',
     fontSize: 18,
     fontWeight: 'bold',
@@ -163,16 +181,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 24,
   },
-  hintContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 24,
-  },
-  hintText: {
-    fontSize: 14,
-    marginLeft: 8,
-  },
 });
 
-export default LoginScreen;
+export default RegisterScreen;

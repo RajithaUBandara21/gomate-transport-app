@@ -7,6 +7,7 @@ import TabNavigator from './TabNavigator';
 import DetailsScreen from '../screens/DetailsScreen';
 import { checkAuth } from '../redux/slices/authSlice';
 import { useTheme } from '../utils/ThemeContext';
+import RegisterScreen from '../screens/RegisterScreen';
 
 const Stack = createStackNavigator();
 
@@ -30,11 +31,19 @@ const StackNavigator = () => {
       }}
     >
       {!isAuthenticated ? (
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-          options={{ headerShown: false }}
-        />
+       <>
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Register"
+            component={RegisterScreen}
+            options={{ headerShown: false }}
+          />
+        </>
+
       ) : (
         <>
           <Stack.Screen
