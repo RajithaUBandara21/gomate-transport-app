@@ -42,9 +42,22 @@ const HomeScreen = ({ navigation }) => {
   const renderHeader = () => (
     <View style={[styles.headerContainer, { backgroundColor: colors.background }]}>
       <View style={styles.headerTop}>
-        <View>
-          <Text style={[styles.greeting, { color: colors.subtext }]}>Welcome back,</Text>
-          <Text style={[styles.username, { color: colors.text }]}>
+        <View style={{ flex: 1 }}>
+          <Text
+            style={[styles.greeting, { color: colors.subtext }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            allowFontScaling
+          >
+            Welcome back,
+          </Text>
+          <Text
+            style={[styles.username, { color: colors.text }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+            allowFontScaling
+          >
             {user?.username || 'Traveler'}
           </Text>
         </View>
@@ -121,6 +134,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginTop: 4,
+    flexShrink: 1,
   },
   headerActions: {
     flexDirection: 'row',

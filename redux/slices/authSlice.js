@@ -40,9 +40,9 @@ export const { loginSuccess, logout, authStart, authFailure } = authSlice.action
 export const loginUser = (credentials) => async (dispatch) => {
   dispatch(authStart());
   try {
-    // GET request to your API to find a user with matching email and password
+    // Use API_URL constant. Note: MockAPI filtering uses query params
     const response = await fetch(
-      `https://692321e909df4a49232469c2.mockapi.io/users?email=${credentials.email}&password=${credentials.password}`
+      `${API_URL}/users?email=${credentials.email}&password=${credentials.password}`
     );
 
     if (!response.ok) {
@@ -53,7 +53,6 @@ export const loginUser = (credentials) => async (dispatch) => {
 
     if (users.length > 0) {
       const user = users[0];
-      // Save user session locally
       await AsyncStorage.setItem('user', JSON.stringify(user));
       dispatch(loginSuccess(user));
       return { success: true };
@@ -70,8 +69,8 @@ export const loginUser = (credentials) => async (dispatch) => {
 export const registerUser = (userData) => async (dispatch) => {
   dispatch(authStart());
   try {
-    // 1. Check API if user already exists
-    const checkRes = await fetch(`https://692321e909df4a49232469c2.mockapi.io/users?email=${userData.email}`);
+    // 1. Check if user already exists
+    const checkRes = await fetch(`${API_URL}/users?email=${userData.email}`);
     const existingUsers = await checkRes.json();
 
     if (existingUsers.length > 0) {
@@ -80,8 +79,8 @@ export const registerUser = (userData) => async (dispatch) => {
       return { success: false, error: msg };
     }
 
-    // 2. Create new user in API
-    const response = await fetch(`${API_URL}/users`, {
+    // 2. Create new user
+    constPkresponse = await fetch(`${API_URL}/users`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

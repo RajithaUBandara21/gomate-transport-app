@@ -1,7 +1,7 @@
 // redux/slices/transportSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MOCK_TRANSPORT_DATA } from '../../utils/constants';
+import { MOCK_TRANSPORT_DATA, API_URL } from '../../utils/constants';
 
 const initialState = {
   routes: [],
@@ -49,28 +49,25 @@ export const {
   removeFavorite,
 } = transportSlice.actions;
 
-/**
- * Fetch real API + fallback to mock data if needed
- */
 export const fetchRoutes = () => async (dispatch) => {
   dispatch(setLoading(true));
 
   try {
-    const response = await fetch(
-      'https://692321e909df4a49232469c2.mockapi.io/routes'
-    );
+    // Use constant API_URL
+    const response = await fetch(`${API_URL}/routes`);
+    
+    if (!response.ok) {
+        throw new Error("Failed to fetch routes");
+    }
+    
     const data = await response.json();
 
-    // Save the API data into redux
     dispatch(setRoutes(data));
-
-    // Optional: Save to AsyncStorage for offline use
     await AsyncStorage.setItem('routes', JSON.stringify(data));
 
   } catch (error) { 
     console.error('API fetch failed, using mock data:', error);
-
-    // fallback to mock data
+    // Fallback to mock data if API fails or endpoint is empty
     dispatch(setRoutes(MOCK_TRANSPORT_DATA));
   }
 };
