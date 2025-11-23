@@ -9,8 +9,9 @@ import {
   Platform,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Feather } from '@expo/vector-icons';
 import CustomInput from '../components/CustomInput';
 import { registerSchema } from '../utils/validation';
@@ -20,6 +21,8 @@ import { useTheme } from '../utils/ThemeContext';
 const RegisterScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const { colors } = useTheme();
+  const { loading } = useSelector((state) => state.auth);
+
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -34,10 +37,8 @@ const RegisterScreen = ({ navigation }) => {
         registerUser({ username, email, password })
       );
 
-      if (result.success) {
-        // Authentication state change will automatically trigger navigation via StackNavigator
-      } else {
-        Alert.alert('Error', 'Registration failed. Please try again.');
+      if (!result.success) {
+        Alert.alert('Registration Error', result.error);
       }
     } catch (err) {
       const validationErrors = {};
@@ -108,8 +109,13 @@ const RegisterScreen = ({ navigation }) => {
           <TouchableOpacity
             style={[styles.registerButton, { backgroundColor: colors.primary }]}
             onPress={handleRegister}
+            disabled={loading}
           >
-            <Text style={styles.registerButtonText}>Sign Up</Text>
+            {loading ? (
+              <ActivityIndicator color="#FFF" />
+            ) : (
+              <Text style={styles.registerButtonText}>Sign Up</Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.footer}>

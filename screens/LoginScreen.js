@@ -9,8 +9,9 @@ import {
   Platform,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Feather } from '@expo/vector-icons';
 import CustomInput from '../components/CustomInput';
 import { loginSchema } from '../utils/validation';
@@ -20,6 +21,8 @@ import { useTheme } from '../utils/ThemeContext';
 const LoginScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const { colors } = useTheme();
+  const { loading } = useSelector((state) => state.auth);
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
@@ -30,13 +33,11 @@ const LoginScreen = ({ navigation }) => {
       setErrors({});
 
       const result = await dispatch(
-        loginUser({ email, username: email.split('@')[0] })
+        loginUser({ email, password })
       );
 
-      if (result.success) {
-        // Navigation handled by auth state change in StackNavigator
-      } else {
-        Alert.alert('Error', 'Login failed. Please try again.');
+      if (!result.success) {
+        Alert.alert('Login Failed', result.error);
       }
     } catch (err) {
       const validationErrors = {};
@@ -91,8 +92,13 @@ const LoginScreen = ({ navigation }) => {
           <TouchableOpacity
             style={[styles.loginButton, { backgroundColor: colors.primary }]}
             onPress={handleLogin}
+            disabled={loading}
           >
-            <Text style={styles.loginButtonText}>Login</Text>
+            {loading ? (
+              <ActivityIndicator color="#FFF" />
+            ) : (
+              <Text style={styles.loginButtonText}>Login</Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.footer}>
@@ -105,7 +111,7 @@ const LoginScreen = ({ navigation }) => {
           <View style={styles.hintContainer}>
             <Feather name="info" size={16} color={colors.subtext} />
             <Text style={[styles.hintText, { color: colors.subtext }]}>
-              Use any email and password (min 6 chars)
+              Log in with your registered account
             </Text>
           </View>
         </View>

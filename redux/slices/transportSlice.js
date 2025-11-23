@@ -17,6 +17,7 @@ const transportSlice = createSlice({
     setRoutes: (state, action) => {
       state.routes = action.payload;
       state.loading = false;
+      state.error = null;
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
@@ -48,12 +49,29 @@ export const {
   removeFavorite,
 } = transportSlice.actions;
 
+/**
+ * Fetch real API + fallback to mock data if needed
+ */
 export const fetchRoutes = () => async (dispatch) => {
   dispatch(setLoading(true));
+
   try {
+    const response = await fetch(
+      'https://692321e909df4a49232469c2.mockapi.io/routes'
+    );
+    const data = await response.json();
+
+    // Save the API data into redux
+    dispatch(setRoutes(data));
+
+    // Optional: Save to AsyncStorage for offline use
+    await AsyncStorage.setItem('routes', JSON.stringify(data));
+
+  } catch (error) { 
+    console.error('API fetch failed, using mock data:', error);
+
+    // fallback to mock data
     dispatch(setRoutes(MOCK_TRANSPORT_DATA));
-  } catch (error) {
-    dispatch(setError(error.message));
   }
 };
 
@@ -74,17 +92,21 @@ export const toggleFavorite = (route) => async (dispatch, getState) => {
     const { favorites } = getState().transport;
     const isFavorite = favorites.some((fav) => fav.id === route.id);
 
+    let updatedFavorites;
+
     if (isFavorite) {
       dispatch(removeFavorite(route.id));
-      const updatedFavorites = favorites.filter((fav) => fav.id !== route.id);
-      const favoritesString = JSON.stringify(updatedFavorites);
-      await AsyncStorage.setItem('favorites', favoritesString);
+      updatedFavorites = favorites.filter((fav) => fav.id !== route.id);
     } else {
       dispatch(addFavorite(route));
-      const updatedFavorites = [...favorites, route];
-      const favoritesString = JSON.stringify(updatedFavorites);
-      await AsyncStorage.setItem('favorites', favoritesString);
+      updatedFavorites = [...favorites, route];
     }
+
+    await AsyncStorage.setItem(
+      'favorites',
+      JSON.stringify(updatedFavorites)
+    );
+
   } catch (error) {
     console.error('Toggle favorite error:', error);
   }
